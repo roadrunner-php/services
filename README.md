@@ -2,6 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spiral/roadrunner-services.svg?style=flat-square)](https://packagist.org/packages/spiral/roadrunner-services)
 [![Total Downloads](https://img.shields.io/packagist/dt/spiral/roadrunner-services.svg?style=flat-square)](https://packagist.org/packages/spiral/roadrunner-services)
+[![build](https://github.com/spiral/roadrunner-services/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/spiral/roadrunner-services/actions/workflows/ci-build.yml)
 
 This package will help you to manage [Roadrunner services](https://roadrunner.dev/docs/beep-beep-service)
 
