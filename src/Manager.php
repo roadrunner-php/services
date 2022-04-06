@@ -30,22 +30,29 @@ final class Manager
      */
     public function list(): array
     {
+        $services = [];
+
         try {
             /** @var PBList $response */
             $response = $this->rpc->call('service.List', new Service(), PBList::class);
 
-            return \iterator_to_array($response->getServices()->getIterator());
+            /** @var string $service */
+            foreach ($response->getServices() as $service) {
+                $services[] = $service;
+            }
         } catch (ServiceException $e) {
             $this->handleError($e);
         }
+
+        return $services;
     }
 
     /**
      * Create a new service.
      *
      * @param non-empty-string $name Service name.
-     * @param non-empty-string $command Command to execute. There are no limitations on commands here. Here could be binary, PHP
-     *     file, script, etc.
+     * @param non-empty-string $command Command to execute. There are no limitations on commands here. Here could be
+     *     binary, PHP file, script, etc.
      * @param int $processNum Number of processes for the command to fire.
      * @param int $execTimeout Maximum allowed time to run for the process.
      * @param bool $remainAfterExit Remain process after exit.
@@ -79,8 +86,11 @@ final class Manager
             ->setExecTimeout($execTimeout)
             ->setRemainAfterExit($remainAfterExit)
             ->setEnv($env)
-            ->setRestartSec($restartSec)
-            ->setWorkingDir($workingDir);
+            ->setRestartSec($restartSec);
+
+        if ($workingDir !== null) {
+            $create->setWorkingDir($workingDir);
+        }
 
         try {
             /** @var Response $response */
@@ -90,6 +100,8 @@ final class Manager
         } catch (ServiceException $e) {
             $this->handleError($e);
         }
+
+        return false;
     }
 
     /**
@@ -108,6 +120,8 @@ final class Manager
         } catch (ServiceException $e) {
             $this->handleError($e);
         }
+
+        return false;
     }
 
     /**
@@ -126,16 +140,18 @@ final class Manager
         } catch (ServiceException $e) {
             $this->handleError($e);
         }
+
+        return false;
     }
 
     /**
      * Get service status.
      *
      * @param non-empty-string $name Service name.
-     * @return array{cpu_percent: float, pid: int, memory_usage: int, command: string}
+     * @return array{command: string, cpu_percent: float, memory_usage: int, pid: int}
      * @throws Exception\ServiceException
      */
-    public function status(string $name): array
+    public function status(string $name): ?array
     {
         try {
             /** @var Status $response */
@@ -144,12 +160,14 @@ final class Manager
             return [
                 'cpu_percent' => $response->getCpuPercent(),
                 'pid' => $response->getPid(),
-                'memory_usage' => $response->getMemoryUsage(),
+                'memory_usage' => (int)$response->getMemoryUsage(),
                 'command' => $response->getCommand(),
             ];
         } catch (ServiceException $e) {
             $this->handleError($e);
         }
+
+        return null;
     }
 
     /**
