@@ -63,8 +63,7 @@ try {
         execTimeout: 0,
         remainAfterExit: false,
         env: ['APP_ENV' => 'production'],
-        restartSec: 30,
-        workingDir: null
+        restartSec: 30
     );
     
     if (!$result) {
