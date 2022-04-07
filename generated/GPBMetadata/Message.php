@@ -16,13 +16,13 @@ class Message
         }
         $pool->internalAddGeneratedFile(
             '
-æ
+Ñ
 message.proto
 service.V1"\'
 Response
 message (	
 
-ok ("í
+ok ("Ø
 Create
 name (	
 command (	
@@ -30,8 +30,7 @@ service.V1"\'
 exec_timeout (
 remain_after_exit ((
 env (2.service.V1.Create.EnvEntry
-restart_sec (
-working_dir (	*
+restart_sec (*
 EnvEntry
 key (	
 value (	:8"O

@@ -59,7 +59,6 @@ final class Manager
      * @param array<non-empty-string, string> $env Environment variables to pass to the underlying process from the
      *     config.
      * @param int $restartSec Delay between process stop and restart.
-     * @param string|null $workingDir
      * @return bool
      * @throws Exception\ServiceException
      *
@@ -72,8 +71,7 @@ final class Manager
         int $execTimeout = 0,
         bool $remainAfterExit = false,
         array $env = [],
-        int $restartSec = 30,
-        ?string $workingDir = null
+        int $restartSec = 30
     ): bool {
         \assert($processNum > 0, 'Process number must be greater than 0.');
         \assert($execTimeout >= 0, 'Execution timeout must be greater or equal to 0.');
@@ -87,10 +85,6 @@ final class Manager
             ->setRemainAfterExit($remainAfterExit)
             ->setEnv($env)
             ->setRestartSec($restartSec);
-
-        if ($workingDir !== null) {
-            $create->setWorkingDir($workingDir);
-        }
 
         try {
             /** @var Response $response */

@@ -41,10 +41,6 @@ class Create extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>uint64 restart_sec = 7;</code>
      */
     protected $restart_sec = 0;
-    /**
-     * Generated from protobuf field <code>string working_dir = 8;</code>
-     */
-    protected $working_dir = '';
 
     /**
      * Constructor.
@@ -59,7 +55,6 @@ class Create extends \Google\Protobuf\Internal\Message
      *     @type bool $remain_after_exit
      *     @type array|\Google\Protobuf\Internal\MapField $env
      *     @type int|string $restart_sec
-     *     @type string $working_dir
      * }
      */
     public function __construct($data = NULL) {
@@ -217,28 +212,6 @@ class Create extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkUint64($var);
         $this->restart_sec = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>string working_dir = 8;</code>
-     * @return string
-     */
-    public function getWorkingDir()
-    {
-        return $this->working_dir;
-    }
-
-    /**
-     * Generated from protobuf field <code>string working_dir = 8;</code>
-     * @param string $var
-     * @return $this
-     */
-    public function setWorkingDir($var)
-    {
-        GPBUtil::checkString($var, True);
-        $this->working_dir = $var;
 
         return $this;
     }
