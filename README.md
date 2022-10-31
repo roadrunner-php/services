@@ -88,6 +88,11 @@ try {
     //    'pid' => 33,
     //    'memory_usage' => 200,
     //    'command' => 'foo/bar',
+    //    'status' => [
+    //      'message' => 'running',
+    //      'code' => 0,
+    //      'details' => [['message' => 'Error message']]
+    //    ]
     // ] 
 } catch (ServiceException $e) {
     // handle exception

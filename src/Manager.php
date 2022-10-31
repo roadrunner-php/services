@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\RoadRunner\Services;
 
+use Google\Protobuf\Any;
 use Spiral\Goridge\RPC\Codec\ProtobufCodec;
 use Spiral\Goridge\RPC\Exception\ServiceException;
 use Spiral\Goridge\RPC\RPCInterface;
@@ -12,6 +13,7 @@ use Spiral\RoadRunner\Services\DTO\V1\PBList;
 use Spiral\RoadRunner\Services\DTO\V1\Response;
 use Spiral\RoadRunner\Services\DTO\V1\Service;
 use Spiral\RoadRunner\Services\DTO\V1\Status;
+use Spiral\RoadRunner\Services\DTO\V1\Statuses;
 
 final class Manager
 {
@@ -142,26 +144,37 @@ final class Manager
      * Get service status.
      *
      * @param non-empty-string $name Service name.
-     * @return array{command: string, cpu_percent: float, memory_usage: int, pid: int}
+     * @return list<array{command: string, cpu_percent: float, memory_usage: int, pid: int, status?: array{code: int, message: string, details: mixed}}>
      * @throws Exception\ServiceException
      */
-    public function status(string $name): ?array
+    public function status(string $name): array
     {
+        $result = [];
         try {
-            /** @var Status $response */
-            $response = $this->rpc->call('service.Status', new Service(['name' => $name]), Status::class);
+            $response = $this->rpc->call('service.Status', new Service(['name' => $name]), Statuses::class);
+            \assert($response instanceof Statuses);
 
-            return [
-                'cpu_percent' => $response->getCpuPercent(),
-                'pid' => $response->getPid(),
-                'memory_usage' => (int)$response->getMemoryUsage(),
-                'command' => $response->getCommand(),
-            ];
+            foreach ($response->getStatus() as $status) {
+                $result[] = [
+                    'cpu_percent' => $status->getCpuPercent(),
+                    'pid' => $status->getPid(),
+                    'memory_usage' => (int)$status->getMemoryUsage(),
+                    'command' => $status->getCommand(),
+                    'status' => [
+                        'code' => $status->getStatus()->getCode(),
+                        'message' => $status->getStatus()->getMessage(),
+                        'details' => \array_map(static fn(Any $any) => [
+                            'message' => $any->getValue(),
+                            'type_url' => $any->getTypeUrl(),
+                        ], \iterator_to_array($status->getStatus()->getDetails()->getIterator())),
+                    ],
+                ];
+            }
         } catch (ServiceException $e) {
             $this->handleError($e);
         }
 
-        return null;
+        return $result;
     }
 
     /**

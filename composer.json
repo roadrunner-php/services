@@ -41,7 +41,7 @@
     },
     "scripts": {
         "build": [
-            "protoc --proto_path=resources/proto/v1 --php_out=generated resources/proto/v1/message.proto"
+            "protoc --proto_path=resources/proto --php_out=generated resources/proto/v1/message.proto resources/proto/shared/status.proto"
         ],
         "tests": "phpunit",
         "analyze": [
