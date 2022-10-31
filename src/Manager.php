@@ -155,19 +155,24 @@ final class Manager
             \assert($response instanceof Statuses);
 
             foreach ($response->getStatus() as $status) {
-                $result[] = [
-                    'cpu_percent' => $status->getCpuPercent(),
-                    'pid' => $status->getPid(),
-                    'memory_usage' => (int)$status->getMemoryUsage(),
-                    'command' => $status->getCommand(),
-                    'status' => [
+                $error = null;
+                if ($status->getStatus() !== null) {
+                    $error = [
                         'code' => $status->getStatus()->getCode(),
                         'message' => $status->getStatus()->getMessage(),
                         'details' => \array_map(static fn(Any $any) => [
                             'message' => $any->getValue(),
                             'type_url' => $any->getTypeUrl(),
                         ], \iterator_to_array($status->getStatus()->getDetails()->getIterator())),
-                    ],
+                    ];
+                }
+
+                $result[] = [
+                    'cpu_percent' => $status->getCpuPercent(),
+                    'pid' => $status->getPid(),
+                    'memory_usage' => (int)$status->getMemoryUsage(),
+                    'command' => $status->getCommand(),
+                    'error' => $error,
                 ];
             }
         } catch (ServiceException $e) {

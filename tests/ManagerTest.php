@@ -205,7 +205,7 @@ final class ManagerTest extends TestCase
                 'pid' => 33,
                 'memory_usage' => 200,
                 'command' => 'foo/bar',
-                'status' => [
+                'error' => [
                     'code' => 100,
                     'message' => 'Running',
                     'details' => [
