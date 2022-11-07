@@ -172,10 +172,10 @@ final class Manager
      * Get service statuses.
      *
      * @param non-empty-string $name Service name.
-     * @return array{command: string, cpu_percent: float, memory_usage: int, pid: int}
+     * @return list<array{command: string, cpu_percent: float, memory_usage: int, pid: int, status?: array{code: int, message: string, details: mixed}}>
      * @throws Exception\ServiceException
      */
-    public function statuses(string $name): ?array
+    public function statuses(string $name): array
     {
         $result = [];
         try {
