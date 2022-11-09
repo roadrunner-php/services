@@ -172,8 +172,35 @@ final class ManagerTest extends TestCase
         $this->rpc
             ->shouldReceive('call')
             ->once()
-            ->withArgs(static function (string $method, Service $in, string $response) {
+            ->withArgs(static function (string $method, Service $in,  string $response) {
                 return $method === 'service.Status'
+                    && $response === Status::class
+                    && $in->getName() === 'foo';
+            })
+            ->andReturn(new Status([
+                'cpu_percent' => 59.5,
+                'pid' => 33,
+                'memory_usage' => 200,
+                'command' => 'foo/bar',
+            ]));
+
+        $status = $this->manager->status('foo');
+
+        $this->assertSame([
+            'cpu_percent' => 59.5,
+            'pid' => 33,
+            'memory_usage' => 200,
+            'command' => 'foo/bar',
+        ], $status);
+    }
+
+    public function testServiceStatusesShouldBeReturned(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->withArgs(static function (string $method, Service $in, string $response) {
+                return $method === 'service.Statuses'
                     && $response === Statuses::class
                     && $in->getName() === 'foo';
             })
@@ -197,7 +224,7 @@ final class ManagerTest extends TestCase
                 ])
             );
 
-        $status = $this->manager->status('foo');
+        $status = $this->manager->statuses('foo');
 
         $this->assertSame([
             [

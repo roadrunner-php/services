@@ -141,17 +141,45 @@ final class Manager
     }
 
     /**
+     * @deprecated since RoadRunner v2.12
+     *
      * Get service status.
+     *
+     * @param non-empty-string $name Service name.
+     * @return array{command: string, cpu_percent: float, memory_usage: int, pid: int}
+     * @throws Exception\ServiceException
+     */
+    public function status(string $name): ?array
+    {
+        try {
+            /** @var Status $response */
+            $response = $this->rpc->call('service.Status', new Service(['name' => $name]), Status::class);
+
+            return [
+                'cpu_percent' => $response->getCpuPercent(),
+                'pid' => $response->getPid(),
+                'memory_usage' => (int)$response->getMemoryUsage(),
+                'command' => $response->getCommand(),
+            ];
+        } catch (ServiceException $e) {
+            $this->handleError($e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get service statuses.
      *
      * @param non-empty-string $name Service name.
      * @return list<array{command: string, cpu_percent: float, memory_usage: int, pid: int, status?: array{code: int, message: string, details: mixed}}>
      * @throws Exception\ServiceException
      */
-    public function status(string $name): array
+    public function statuses(string $name): array
     {
         $result = [];
         try {
-            $response = $this->rpc->call('service.Status', new Service(['name' => $name]), Statuses::class);
+            $response = $this->rpc->call('service.Statuses', new Service(['name' => $name]), Statuses::class);
             \assert($response instanceof Statuses);
 
             foreach ($response->getStatus() as $status) {
