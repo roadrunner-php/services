@@ -30,7 +30,7 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.0",
+        "phpunit/phpunit": "^9.5",
         "mockery/mockery": "^1.5",
         "vimeo/psalm": ">=4.4"
     },
@@ -41,7 +41,7 @@
     },
     "scripts": {
         "build": [
-            "protoc --proto_path=resources/proto/v1 --php_out=generated resources/proto/v1/message.proto"
+            "protoc --proto_path=resources/proto --php_out=generated resources/proto/v1/message.proto resources/proto/shared/status.proto"
         ],
         "tests": "phpunit",
         "analyze": [
