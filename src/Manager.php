@@ -141,7 +141,7 @@ final class Manager
     }
 
     /**
-     * @deprecated since RoadRunner v2.12
+     * @deprecated since RoadRunner v2.12. {@use Manager::statuses()}
      *
      * Get service status.
      *

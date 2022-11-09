@@ -80,6 +80,42 @@ try {
 use Spiral\RoadRunner\Services\Exception\ServiceException;
 
 try {
+    $status = $manager->statuses(name: 'listen-jobs');
+    
+    // Will return an array with statuses of every run process
+    // [
+    //    [
+    //      'cpu_percent' => 59.5,
+    //      'pid' => 33,
+    //      'memory_usage' => 200,
+    //      'command' => 'foo/bar',
+    //      'error' => null
+    //    ],
+    //    [
+    //      'cpu_percent' => 60.2,
+    //      'pid' => 34,
+    //      'memory_usage' => 189,
+    //      'command' => 'foo/bar'
+    //      'error' => [
+    //          'code' => 1,
+    //          'message' => 'Process exited with code 1'
+    //          'details' => [...] // array with details
+    //      ]
+    //    ],
+    // ] 
+} catch (ServiceException $e) {
+    // handle exception
+}
+```
+
+### Check service status 
+
+> **Warning** Deprecated since RoadRunner v2.12.0
+
+```php
+use Spiral\RoadRunner\Services\Exception\ServiceException;
+
+try {
     $status = $manager->status(name: 'listen-jobs');
     
     // Will return an array with service status fields
@@ -87,12 +123,7 @@ try {
     //    'cpu_percent' => 59.5,
     //    'pid' => 33,
     //    'memory_usage' => 200,
-    //    'command' => 'foo/bar',
-    //    'status' => [
-    //      'message' => 'running',
-    //      'code' => 0,
-    //      'details' => [['message' => 'Error message']]
-    //    ]
+    //    'command' => 'foo/bar'
     // ] 
 } catch (ServiceException $e) {
     // handle exception
