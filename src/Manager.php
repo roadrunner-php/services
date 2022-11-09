@@ -172,8 +172,20 @@ final class Manager
      * Get service statuses.
      *
      * @param non-empty-string $name Service name.
-     * @return list<array{command: string, cpu_percent: float, memory_usage: int, pid: int, status?: array{code: int, message: string, details: mixed}}>
+     * @return list<array{
+     *     command: string,
+     *     cpu_percent: float,
+     *     memory_usage: int,
+     *     pid: int,
+     *     error?: array{
+     *        code: int,
+     *        message: string,
+     *        details: array{message: string, type_url: string}[]
+     *    }
+     * }>
      * @throws Exception\ServiceException
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
      */
     public function statuses(string $name): array
     {
@@ -183,7 +195,10 @@ final class Manager
             \assert($response instanceof Statuses);
 
             foreach ($response->getStatus() as $status) {
+                \assert($status instanceof Status);
+
                 $error = null;
+                /** @psalm-suppress RedundantConditionGivenDocblockType */
                 if ($status->getStatus() !== null) {
                     $error = [
                         'code' => $status->getStatus()->getCode(),
@@ -198,7 +213,7 @@ final class Manager
                 $result[] = [
                     'cpu_percent' => $status->getCpuPercent(),
                     'pid' => $status->getPid(),
-                    'memory_usage' => (int)$status->getMemoryUsage(),
+                    'memory_usage' => $status->getMemoryUsage(),
                     'command' => $status->getCommand(),
                     'error' => $error,
                 ];
