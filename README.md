@@ -40,13 +40,6 @@ use Spiral\RoadRunner\Services\Manager;
 use Spiral\Goridge\RPC\RPC;
 
 $rpc = RPC::create('tcp://127.0.0.1:6001'));
-// or
-$rpc = RPC::fromGlobals();
-// or
-$rpc = RPC::fromEnvironment(new \Spiral\RoadRunner\Environment([
-    'RR_RPC' => 'tcp://127.0.0.1:6001'
-]));
-
 $manager = new Manager($rpc);
 ```
 
