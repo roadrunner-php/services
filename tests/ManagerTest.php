@@ -8,12 +8,12 @@ use Google\Protobuf\Any;
 use Mockery as m;
 use Spiral\Goridge\RPC\Codec\ProtobufCodec;
 use Spiral\Goridge\RPC\RPCInterface;
-use Spiral\RoadRunner\Services\DTO\V1\Create;
-use Spiral\RoadRunner\Services\DTO\V1\PBList;
-use Spiral\RoadRunner\Services\DTO\V1\Response;
-use Spiral\RoadRunner\Services\DTO\V1\Service;
-use Spiral\RoadRunner\Services\DTO\V1\Status;
-use Spiral\RoadRunner\Services\DTO\V1\Statuses;
+use RoadRunner\Service\DTO\V1\Create;
+use RoadRunner\Service\DTO\V1\PBList;
+use RoadRunner\Service\DTO\V1\Response;
+use RoadRunner\Service\DTO\V1\Service;
+use RoadRunner\Service\DTO\V1\Status;
+use RoadRunner\Service\DTO\V1\Statuses;
 use Spiral\RoadRunner\Services\Exception\ServiceException;
 use Spiral\RoadRunner\Services\Manager;
 
@@ -57,7 +57,7 @@ final class ManagerTest extends TestCase
     public function testListServicesWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -101,7 +101,7 @@ final class ManagerTest extends TestCase
     public function testServiceCreateWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -129,7 +129,7 @@ final class ManagerTest extends TestCase
     public function testServiceRestartWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -157,7 +157,7 @@ final class ManagerTest extends TestCase
     public function testServiceTerminateWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -165,33 +165,6 @@ final class ManagerTest extends TestCase
             ->andThrow(new \Spiral\Goridge\RPC\Exception\ServiceException('Something went wrong'));
 
         $this->manager->terminate('foo');
-    }
-
-    public function testServiceStatusShouldBeReturned(): void
-    {
-        $this->rpc
-            ->shouldReceive('call')
-            ->once()
-            ->withArgs(static function (string $method, Service $in,  string $response) {
-                return $method === 'service.Status'
-                    && $response === Status::class
-                    && $in->getName() === 'foo';
-            })
-            ->andReturn(new Status([
-                'cpu_percent' => 59.5,
-                'pid' => 33,
-                'memory_usage' => 200,
-                'command' => 'foo/bar',
-            ]));
-
-        $status = $this->manager->status('foo');
-
-        $this->assertSame([
-            'cpu_percent' => 59.5,
-            'pid' => 33,
-            'memory_usage' => 200,
-            'command' => 'foo/bar',
-        ], $status);
     }
 
     public function testServiceStatusesShouldBeReturned(): void
@@ -212,7 +185,7 @@ final class ManagerTest extends TestCase
                             'pid' => 33,
                             'memory_usage' => 200,
                             'command' => 'foo/bar',
-                            'status' => new \Spiral\RoadRunner\Services\DTO\Shared\Status([
+                            'status' => new \RoadRunner\Shared\DTO\V1\Status([
                                 'code' => 100,
                                 'message' => 'Running',
                                 'details' => [
@@ -241,18 +214,5 @@ final class ManagerTest extends TestCase
                 ],
             ],
         ], $status);
-    }
-
-    public function testServiceAtatusWithErrorsShouldThrowAnException(): void
-    {
-        $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
-
-        $this->rpc
-            ->shouldReceive('call')
-            ->once()
-            ->andThrow(new \Spiral\Goridge\RPC\Exception\ServiceException('Something went wrong'));
-
-        $this->manager->status('foo');
     }
 }

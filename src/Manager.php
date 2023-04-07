@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Spiral\RoadRunner\Services;
 
 use Google\Protobuf\Any;
+use RoadRunner\Service\DTO\V1\Create;
+use RoadRunner\Service\DTO\V1\PBList;
+use RoadRunner\Service\DTO\V1\Response;
+use RoadRunner\Service\DTO\V1\Service;
+use RoadRunner\Service\DTO\V1\Status;
+use RoadRunner\Service\DTO\V1\Statuses;
 use Spiral\Goridge\RPC\Codec\ProtobufCodec;
 use Spiral\Goridge\RPC\Exception\ServiceException;
 use Spiral\Goridge\RPC\RPCInterface;
-use Spiral\RoadRunner\Services\DTO\V1\Create;
-use Spiral\RoadRunner\Services\DTO\V1\PBList;
-use Spiral\RoadRunner\Services\DTO\V1\Response;
-use Spiral\RoadRunner\Services\DTO\V1\Service;
-use Spiral\RoadRunner\Services\DTO\V1\Status;
-use Spiral\RoadRunner\Services\DTO\V1\Statuses;
 
 final class Manager
 {
-    private RPCInterface $rpc;
+    private readonly RPCInterface $rpc;
 
     public function __construct(RPCInterface $rpc)
     {
@@ -55,12 +55,12 @@ final class Manager
      * @param non-empty-string $name Service name.
      * @param non-empty-string $command Command to execute. There are no limitations on commands here. Here could be
      *     binary, PHP file, script, etc.
-     * @param int $processNum Number of processes for the command to fire.
-     * @param int $execTimeout Maximum allowed time to run for the process.
+     * @param int<1, max> $processNum Number of processes for the command to fire.
+     * @param int<0, max> $execTimeout Maximum allowed time to run for the process.
      * @param bool $remainAfterExit Remain process after exit.
      * @param array<non-empty-string, string> $env Environment variables to pass to the underlying process from the
      *     config.
-     * @param int $restartSec Delay between process stop and restart.
+     * @param int<1, max> $restartSec Delay between process stop and restart.
      * @return bool
      * @throws Exception\ServiceException
      *
@@ -73,7 +73,7 @@ final class Manager
         int $execTimeout = 0,
         bool $remainAfterExit = false,
         array $env = [],
-        int $restartSec = 30
+        int $restartSec = 30,
     ): bool {
         \assert($processNum > 0, 'Process number must be greater than 0.');
         \assert($execTimeout >= 0, 'Execution timeout must be greater or equal to 0.');
@@ -141,45 +141,17 @@ final class Manager
     }
 
     /**
-     * @deprecated since RoadRunner v2.12. {@use Manager::statuses()}
-     *
-     * Get service status.
-     *
-     * @param non-empty-string $name Service name.
-     * @return array{command: string, cpu_percent: float, memory_usage: int, pid: int}
-     * @throws Exception\ServiceException
-     */
-    public function status(string $name): ?array
-    {
-        try {
-            /** @var Status $response */
-            $response = $this->rpc->call('service.Status', new Service(['name' => $name]), Status::class);
-
-            return [
-                'cpu_percent' => $response->getCpuPercent(),
-                'pid' => $response->getPid(),
-                'memory_usage' => (int)$response->getMemoryUsage(),
-                'command' => $response->getCommand(),
-            ];
-        } catch (ServiceException $e) {
-            $this->handleError($e);
-        }
-
-        return null;
-    }
-
-    /**
      * Get service statuses.
      *
      * @param non-empty-string $name Service name.
      * @return list<array{
-     *     command: string,
+     *     command: non-empty-string,
      *     cpu_percent: float,
-     *     memory_usage: int,
-     *     pid: int,
+     *     memory_usage: positive-int,
+     *     pid: positive-int,
      *     error?: array{
      *        code: int,
-     *        message: string,
+     *        message: non-empty-string,
      *        details: array{message: string, type_url: string}[]
      *    }
      * }>
@@ -198,15 +170,16 @@ final class Manager
                 \assert($status instanceof Status);
 
                 $error = null;
+                $statusError = $status->getStatus();
                 /** @psalm-suppress RedundantConditionGivenDocblockType */
-                if ($status->getStatus() !== null) {
+                if ($statusError !== null) {
                     $error = [
-                        'code' => $status->getStatus()->getCode(),
-                        'message' => $status->getStatus()->getMessage(),
-                        'details' => \array_map(static fn(Any $any) => [
+                        'code' => $statusError->getCode(),
+                        'message' => $statusError->getMessage(),
+                        'details' => \array_map(static fn (Any $any) => [
                             'message' => $any->getValue(),
                             'type_url' => $any->getTypeUrl(),
-                        ], \iterator_to_array($status->getStatus()->getDetails()->getIterator())),
+                        ], \iterator_to_array($statusError->getDetails()->getIterator())),
                     ];
                 }
 
@@ -233,6 +206,6 @@ final class Manager
     {
         $message = \str_replace(["\t", "\n"], ' ', $e->getMessage());
 
-        throw new Exception\ServiceException($message, (int)$e->getCode(), $e);
+        throw new Exception\ServiceException($message, $e->getCode(), $e);
     }
 }
