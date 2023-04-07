@@ -1,8 +1,10 @@
 # Roadrunner services manager
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/spiral/roadrunner-services.svg?style=flat-square)](https://packagist.org/packages/spiral/roadrunner-services)
-[![Total Downloads](https://img.shields.io/packagist/dt/spiral/roadrunner-services.svg?style=flat-square)](https://packagist.org/packages/spiral/roadrunner-services)
-[![build](https://github.com/spiral/roadrunner-services/actions/workflows/ci-build.yml/badge.svg?branch=master)](https://github.com/spiral/roadrunner-services/actions/workflows/ci-build.yml)
+[![PHP Version Require](https://poser.pugx.org/spiral/roadrunner-services/require/php)](https://packagist.org/packages/spiral/roadrunner-services)
+[![Latest Stable Version](https://poser.pugx.org/spiral/roadrunner-services/v/stable)](https://packagist.org/packages/spiral/roadrunner-services)
+[![phpunit](https://github.com/spiral/roadrunner-services/actions/workflows/phpunit.yml/badge.svg)](https://github.com/spiral/roadrunner-services/actions)
+[![psalm](https://github.com/spiral/roadrunner-services/actions/workflows/psalm.yml/badge.svg)](https://github.com/spiral/roadrunner-services/actions)
+[![Total Downloads](https://poser.pugx.org/spiral/roadrunner-services/downloads)](https://packagist.org/packages/spiral/roadrunner-services)
 
 This package will help you to manage [Roadrunner services](https://roadrunner.dev/docs/beep-beep-service)
 
@@ -25,7 +27,7 @@ composer require spiral/roadrunner-services
 Such a configuration would be quite feasible to run:
 
 ```yaml
-version: '2.7'
+version: '3.0'
 
 rpc:
   listen: tcp://127.0.0.1:6001
@@ -95,28 +97,6 @@ try {
     //          'details' => [...] // array with details
     //      ]
     //    ],
-    // ] 
-} catch (ServiceException $e) {
-    // handle exception
-}
-```
-
-### Check service status 
-
-> **Warning** Deprecated since RoadRunner v2.12.0
-
-```php
-use Spiral\RoadRunner\Services\Exception\ServiceException;
-
-try {
-    $status = $manager->status(name: 'listen-jobs');
-    
-    // Will return an array with service status fields
-    // [
-    //    'cpu_percent' => 59.5,
-    //    'pid' => 33,
-    //    'memory_usage' => 200,
-    //    'command' => 'foo/bar'
     // ] 
 } catch (ServiceException $e) {
     // handle exception
