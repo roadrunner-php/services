@@ -61,9 +61,7 @@ final class Manager
      * @param array<non-empty-string, string> $env Environment variables to pass to the underlying process from the
      *     config.
      * @param int<1, max> $restartSec Delay between process stop and restart.
-     * @return bool
      * @throws Exception\ServiceException
-     *
      * @see https://roadrunner.dev/docs/beep-beep-service
      */
     public function create(
@@ -199,10 +197,9 @@ final class Manager
     }
 
     /**
-     * @param ServiceException $e
      * @throws Exception\ServiceException
      */
-    private function handleError(ServiceException $e): void
+    private function handleError(ServiceException $e): never
     {
         $message = \str_replace(["\t", "\n"], ' ', $e->getMessage());
 
