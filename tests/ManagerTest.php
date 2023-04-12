@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Spiral\RoadRunner\Services\Tests;
 
+use Google\Protobuf\Any;
 use Mockery as m;
 use Spiral\Goridge\RPC\Codec\ProtobufCodec;
 use Spiral\Goridge\RPC\RPCInterface;
-use Spiral\RoadRunner\Services\DTO\V1\Create;
-use Spiral\RoadRunner\Services\DTO\V1\PBList;
-use Spiral\RoadRunner\Services\DTO\V1\Response;
-use Spiral\RoadRunner\Services\DTO\V1\Service;
-use Spiral\RoadRunner\Services\DTO\V1\Status;
+use RoadRunner\Service\DTO\V1\Create;
+use RoadRunner\Service\DTO\V1\PBList;
+use RoadRunner\Service\DTO\V1\Response;
+use RoadRunner\Service\DTO\V1\Service;
+use RoadRunner\Service\DTO\V1\Status;
+use RoadRunner\Service\DTO\V1\Statuses;
 use Spiral\RoadRunner\Services\Exception\ServiceException;
 use Spiral\RoadRunner\Services\Manager;
 
@@ -41,7 +43,7 @@ final class ManagerTest extends TestCase
         $this->rpc
             ->shouldReceive('call')
             ->once()
-            ->withArgs(static function (string $method, Service $in,  string $response) {
+            ->withArgs(static function (string $method, Service $in, string $response) {
                 return $method === 'service.List'
                     && $response === PBList::class;
             })
@@ -55,7 +57,7 @@ final class ManagerTest extends TestCase
     public function testListServicesWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -70,7 +72,7 @@ final class ManagerTest extends TestCase
         $this->rpc
             ->shouldReceive('call')
             ->once()
-            ->withArgs(static function (string $method, Create $in,  string $response) {
+            ->withArgs(static function (string $method, Create $in, string $response) {
                 return $method === 'service.Create'
                     && $response === Response::class
                     && $in->getName() === 'foo'
@@ -99,7 +101,7 @@ final class ManagerTest extends TestCase
     public function testServiceCreateWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -114,7 +116,7 @@ final class ManagerTest extends TestCase
         $this->rpc
             ->shouldReceive('call')
             ->once()
-            ->withArgs(static function (string $method, Service $in,  string $response) {
+            ->withArgs(static function (string $method, Service $in, string $response) {
                 return $method === 'service.Restart'
                     && $response === Response::class
                     && $in->getName() === 'foo';
@@ -127,7 +129,7 @@ final class ManagerTest extends TestCase
     public function testServiceRestartWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -142,7 +144,7 @@ final class ManagerTest extends TestCase
         $this->rpc
             ->shouldReceive('call')
             ->once()
-            ->withArgs(static function (string $method, Service $in,  string $response) {
+            ->withArgs(static function (string $method, Service $in, string $response) {
                 return $method === 'service.Terminate'
                     && $response === Response::class
                     && $in->getName() === 'foo';
@@ -155,7 +157,7 @@ final class ManagerTest extends TestCase
     public function testServiceTerminateWithErrorsShouldThrowAnException(): void
     {
         $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -165,43 +167,52 @@ final class ManagerTest extends TestCase
         $this->manager->terminate('foo');
     }
 
-    public function testServiceStatusShouldBeReturned(): void
+    public function testServiceStatusesShouldBeReturned(): void
     {
         $this->rpc
             ->shouldReceive('call')
             ->once()
-            ->withArgs(static function (string $method, Service $in,  string $response) {
-                return $method === 'service.Status'
-                    && $response === Status::class
+            ->withArgs(static function (string $method, Service $in, string $response) {
+                return $method === 'service.Statuses'
+                    && $response === Statuses::class
                     && $in->getName() === 'foo';
             })
-            ->andReturn(new Status([
-                'CPUPercent' => 59.5,
-                'pid' => 33,
-                'memoryUsage' => 200,
-                'command' => 'foo/bar',
-            ]));
+            ->andReturn(
+                new Statuses([
+                    'status' => [
+                        new Status([
+                            'cpu_percent' => 59.5,
+                            'pid' => 33,
+                            'memory_usage' => 200,
+                            'command' => 'foo/bar',
+                            'status' => new \RoadRunner\Shared\DTO\V1\Status([
+                                'code' => 100,
+                                'message' => 'Running',
+                                'details' => [
+                                    new Any(['type_url' => 'foo', 'value' => 'bar']),
+                                ],
+                            ]),
+                        ]),
+                    ],
+                ])
+            );
 
-        $status = $this->manager->status('foo');
+        $status = $this->manager->statuses('foo');
 
         $this->assertSame([
-            'cpu_percent' => 59.5,
-            'pid' => 33,
-            'memory_usage' => 200,
-            'command' => 'foo/bar',
+            [
+                'cpu_percent' => 59.5,
+                'pid' => 33,
+                'memory_usage' => 200,
+                'command' => 'foo/bar',
+                'error' => [
+                    'code' => 100,
+                    'message' => 'Running',
+                    'details' => [
+                        ['message' => 'bar', 'type_url' => 'foo'],
+                    ],
+                ],
+            ],
         ], $status);
-    }
-
-    public function testServiceAtatusWithErrorsShouldThrowAnException(): void
-    {
-        $this->expectException(ServiceException::class);
-        $this->expectErrorMessage('Something went wrong');
-
-        $this->rpc
-            ->shouldReceive('call')
-            ->once()
-            ->andThrow(new \Spiral\Goridge\RPC\Exception\ServiceException('Something went wrong'));
-
-        $this->manager->status('foo');
     }
 }

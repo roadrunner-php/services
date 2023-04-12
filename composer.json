@@ -9,30 +9,47 @@
             "email": "pavel.buchnev@spiralscout.com"
         },
         {
+            "name": "Aleksei Gagarin (roxblnfk)",
+            "email": "alexey.gagarin@spiralscout.com"
+        },
+        {
+            "name": "Maksim Smakouz (msmakouz)",
+            "email": "maksim.smakouz@spiralscout.com"
+        },
+        {
             "name": "RoadRunner Community",
             "homepage": "https://github.com/spiral/roadrunner/graphs/contributors"
         }
     ],
+    "homepage": "https://roadrunner.dev/",
+    "support": {
+        "docs": "https://roadrunner.dev/docs",
+        "issues": "https://github.com/roadrunner-server/roadrunner/issues",
+        "forum": "https://forum.roadrunner.dev/",
+        "chat": "https://discord.gg/V6EK4he"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/roadrunner-server"
+        }
+    ],
     "require": {
-        "php": ">=7.4",
-        "ext-json": "*",
-        "spiral/roadrunner": "^2.0",
+        "php": ">=8.1",
+        "roadrunner-php/roadrunner-api-dto": "^1.0",
+        "spiral/roadrunner": "^2023.1",
         "spiral/goridge": "^3.1",
         "google/protobuf": "^3.7"
     },
     "autoload": {
         "psr-4": {
-            "Spiral\\RoadRunner\\Services\\": [
-                "src",
-                "generated/Spiral/RoadRunner/Services"
-            ],
-            "GPBMetadata\\": "generated/GPBMetadata"
+            "Spiral\\RoadRunner\\Services\\": "src"
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.0",
+        "phpunit/phpunit": "^9.5",
         "mockery/mockery": "^1.5",
-        "vimeo/psalm": ">=4.4"
+        "vimeo/psalm": ">=5.8"
     },
     "autoload-dev": {
         "psr-4": {
@@ -40,23 +57,8 @@
         }
     },
     "scripts": {
-        "build": [
-            "protoc --proto_path=resources/proto/v1 --php_out=generated resources/proto/v1/message.proto"
-        ],
         "tests": "phpunit",
-        "analyze": [
-            "psalm --no-cache",
-            "spiral-cs check src tests"
-        ]
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
-    },
-    "suggest": {
-        "ext-igbinary": "(>3.1.6) Igbinary serailizer support",
-        "ext-sodium": "Sodium serailizer support"
+        "psalm": "psalm --no-cache"
     },
     "config": {
         "sort-packages": true
