@@ -20,8 +20,7 @@ use Spiral\RoadRunner\Services\Manager;
 final class ManagerTest extends TestCase
 {
     private Manager $manager;
-    /** @var m\LegacyMockInterface|m\MockInterface|RPCInterface */
-    private $rpc;
+    private m\LegacyMockInterface|m\MockInterface|RPCInterface $rpc;
 
     protected function setUp(): void
     {
