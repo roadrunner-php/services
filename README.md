@@ -27,8 +27,6 @@ composer require spiral/roadrunner-services
 Such a configuration would be quite feasible to run:
 
 ```yaml
-version: '3.0'
-
 rpc:
   listen: tcp://127.0.0.1:6001
 
