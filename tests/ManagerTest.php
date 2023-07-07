@@ -80,7 +80,9 @@ final class ManagerTest extends TestCase
                     && $in->getExecTimeout() === 7
                     && $in->getRemainAfterExit() === true
                     && \iterator_to_array($in->getEnv()->getIterator()) === ['FOO' => 'bar', 'BAZ' => 'foo']
-                    && $in->getRestartSec() === 50;
+                    && $in->getRestartSec() === 50
+                    && $in->getServiceNameInLogs() === true
+                    && $in->getTimeoutStopSec() === 10;
             })
             ->andReturn(new Response(['ok' => true]));
 
@@ -92,7 +94,9 @@ final class ManagerTest extends TestCase
                 7,
                 true,
                 ['FOO' => 'bar', 'BAZ' => 'foo'],
-                50
+                50,
+                true,
+                10
             )
         );
     }
