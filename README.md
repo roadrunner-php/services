@@ -12,7 +12,7 @@ This package will help you to manage [Roadrunner services](https://roadrunner.de
 
 Make sure that your server is configured with following PHP version and extensions:
 
-- PHP 7.4+
+- PHP 8.1+
 
 ## Installation
 
