@@ -61,6 +61,8 @@ final class Manager
      * @param array<non-empty-string, string> $env Environment variables to pass to the underlying process from the
      *     config.
      * @param int<1, max> $restartSec Delay between process stop and restart.
+     * @param bool $serviceNameInLogs Show the name of the service in logs (e.g. service.some_service_1).
+     * @param int<0, max> $stopTimeout Timeout for the process stop operation.
      * @throws Exception\ServiceException
      * @see https://roadrunner.dev/docs/beep-beep-service
      */
@@ -72,10 +74,13 @@ final class Manager
         bool $remainAfterExit = false,
         array $env = [],
         int $restartSec = 30,
+        bool $serviceNameInLogs = false,
+        int $stopTimeout = 5
     ): bool {
         \assert($processNum > 0, 'Process number must be greater than 0.');
         \assert($execTimeout >= 0, 'Execution timeout must be greater or equal to 0.');
         \assert($restartSec > 0, 'Restart delay must be greater than 0.');
+        \assert($stopTimeout >= 0, 'Timeout for the process stop operation must be greater or equal to 0.');
 
         $create = (new Create())
             ->setName($name)
@@ -84,7 +89,9 @@ final class Manager
             ->setExecTimeout($execTimeout)
             ->setRemainAfterExit($remainAfterExit)
             ->setEnv($env)
-            ->setRestartSec($restartSec);
+            ->setRestartSec($restartSec)
+            ->setServiceNameInLogs($serviceNameInLogs)
+            ->setTimeoutStopSec($stopTimeout);
 
         try {
             /** @var Response $response */
