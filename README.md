@@ -13,7 +13,7 @@
 [![psalm](https://github.com/spiral/roadrunner-services/actions/workflows/psalm.yml/badge.svg)](https://github.com/spiral/roadrunner-services/actions)
 [![Total Downloads](https://poser.pugx.org/spiral/roadrunner-services/downloads)](https://packagist.org/packages/spiral/roadrunner-services)
 
-This package will help you to manage [Roadrunner services](https://roadrunner.dev/docs/plugins-service)
+This package will help you to manage [Roadrunner services](https://docs.roadrunner.dev/plugins/service)
 
 ## Requirements
 

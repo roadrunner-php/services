@@ -64,7 +64,7 @@ final class Manager
      * @param bool $serviceNameInLogs Show the name of the service in logs (e.g. service.some_service_1).
      * @param int<0, max> $stopTimeout Timeout for the process stop operation.
      * @throws Exception\ServiceException
-     * @see https://roadrunner.dev/docs/beep-beep-service
+     * @see https://docs.roadrunner.dev/plugins/service
      */
     public function create(
         string $name,
