@@ -188,7 +188,7 @@ final class ManagerTest extends TestCase
                             'pid' => 33,
                             'memory_usage' => 200,
                             'command' => 'foo/bar',
-                            'status' => new \RoadRunner\Shared\DTO\V1\Status([
+                            'status' => new \RoadRunner\Common\DTO\V1\Status([
                                 'code' => 100,
                                 'message' => 'Running',
                                 'details' => [
