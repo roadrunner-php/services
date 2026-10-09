@@ -49,6 +49,7 @@
     "require-dev": {
         "mockery/mockery": "^1.5",
         "phpunit/phpunit": "^10.0",
+        "spiral/code-style": "^2.3.1",
         "vimeo/psalm": ">=5.8"
     },
     "autoload-dev": {
@@ -57,6 +58,8 @@
         }
     },
     "scripts": {
+        "cs:diff": "php-cs-fixer fix --dry-run -v --diff",
+        "cs:fix": "php-cs-fixer fix -v",
         "tests": "phpunit",
         "psalm": "psalm --no-cache"
     },

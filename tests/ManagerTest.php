@@ -22,21 +22,6 @@ final class ManagerTest extends TestCase
     private Manager $manager;
     private m\LegacyMockInterface|m\MockInterface|RPCInterface $rpc;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->rpc = m::mock(RPCInterface::class);
-
-        $this->rpc
-            ->shouldReceive('withCodec')
-            ->once()
-            ->withArgs(static fn($codec): bool => $codec instanceof ProtobufCodec)
-            ->andReturnSelf();
-
-        $this->manager = new Manager($this->rpc);
-    }
-
     public function testListServices(): void
     {
         $this->rpc
@@ -96,8 +81,8 @@ final class ManagerTest extends TestCase
                 ['FOO' => 'bar', 'BAZ' => 'foo'],
                 50,
                 true,
-                10
-            )
+                10,
+            ),
         );
     }
 
@@ -197,7 +182,7 @@ final class ManagerTest extends TestCase
                             ]),
                         ]),
                     ],
-                ])
+                ]),
             );
 
         $status = $this->manager->statuses('foo');
@@ -217,5 +202,20 @@ final class ManagerTest extends TestCase
                 ],
             ],
         ], $status);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->rpc = m::mock(RPCInterface::class);
+
+        $this->rpc
+            ->shouldReceive('withCodec')
+            ->once()
+            ->withArgs(static fn($codec): bool => $codec instanceof ProtobufCodec)
+            ->andReturnSelf();
+
+        $this->manager = new Manager($this->rpc);
     }
 }
