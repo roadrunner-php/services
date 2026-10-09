@@ -203,6 +203,131 @@ final class ManagerTest
         ]);
     }
 
+    public function testListReturnsEmptyArrayWhenNoServicesAreRunning(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andReturn(new PBList());
+
+        Assert::same($this->manager->list(), []);
+    }
+
+    public function testServiceCreatedWithDefaultOptions(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->withArgs(static fn(string $method, Create $in, string $response): bool => $method === 'service.Create'
+                && $in->getName() === 'foo'
+                && $in->getCommand() === 'bar'
+                && $in->getProcessNum() === 1
+                && $in->getExecTimeout() === 0
+                && $in->getRemainAfterExit() === false
+                && \count($in->getEnv()) === 0
+                && $in->getRestartSec() === 30
+                && $in->getServiceNameInLogs() === false
+                && $in->getTimeoutStopSec() === 5)
+            ->andReturn(new Response(['ok' => true]));
+
+        Assert::true($this->manager->create('foo', 'bar'));
+    }
+
+    public function testServiceCreateReturnsFalseWhenRoadRunnerRejectsIt(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andReturn(new Response(['ok' => false]));
+
+        Assert::false($this->manager->create('foo', 'bar'));
+    }
+
+    public function testServiceRestartReturnsFalseWhenRoadRunnerRejectsIt(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andReturn(new Response(['ok' => false]));
+
+        Assert::false($this->manager->restart('foo'));
+    }
+
+    public function testServiceTerminateReturnsFalseWhenRoadRunnerRejectsIt(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andReturn(new Response(['ok' => false]));
+
+        Assert::false($this->manager->terminate('foo'));
+    }
+
+    public function testServiceStatusesWithErrorsShouldThrowAnException(): never
+    {
+        Expect::exception(ServiceException::class)->withMessage('Something went wrong');
+
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andThrow(new \Spiral\Goridge\RPC\Exception\ServiceException('Something went wrong'));
+
+        $this->manager->statuses('foo');
+    }
+
+    public function testRpcErrorIsWrappedOnOneLineKeepingCodeAndPrevious(): never
+    {
+        $previous = new \Spiral\Goridge\RPC\Exception\ServiceException("first line\nsecond\tline", 42);
+        Expect::exception(ServiceException::class)
+            ->withMessage('first line second line')
+            ->withCode(42)
+            ->withPrevious($previous);
+
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andThrow($previous);
+
+        $this->manager->list();
+    }
+
+    public function testServiceStatusWithoutErrorHasNullError(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andReturn(new Statuses([
+                'status' => [
+                    new Status([
+                        'cpu_percent' => 1.5,
+                        'pid' => 10,
+                        'memory_usage' => 100,
+                        'command' => 'php worker.php',
+                    ]),
+                ],
+            ]));
+
+        Assert::same($this->manager->statuses('foo'), [
+            [
+                'cpu_percent' => 1.5,
+                'pid' => 10,
+                'memory_usage' => 100,
+                'command' => 'php worker.php',
+                'error' => null,
+            ],
+        ]);
+    }
+
+    public function testServiceStatusesReturnEmptyArrayWhenServiceHasNoProcesses(): void
+    {
+        $this->rpc
+            ->shouldReceive('call')
+            ->once()
+            ->andReturn(new Statuses());
+
+        Assert::same($this->manager->statuses('foo'), []);
+    }
+
     #[BeforeTest]
     protected function setUp(): void
     {
