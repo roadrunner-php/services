@@ -2,16 +2,16 @@ on:
   push:
     branches:
       - 2.x
-  pull_request: null
+  pull_request: ~
 
-name: static analysis
+name: testo
 
 permissions:
   contents: read
 
 jobs:
-  psalm:
-    uses: spiral/gh-actions/.github/workflows/psalm.yml@master
+  testo:
+    uses: spiral/gh-actions/.github/workflows/testo.yml@master
     with:
       os: >-
         ['ubuntu-latest']

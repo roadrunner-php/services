@@ -9,7 +9,6 @@ use RoadRunner\Service\DTO\V1\Create;
 use RoadRunner\Service\DTO\V1\PBList;
 use RoadRunner\Service\DTO\V1\Response;
 use RoadRunner\Service\DTO\V1\Service;
-use RoadRunner\Service\DTO\V1\Status;
 use RoadRunner\Service\DTO\V1\Statuses;
 use Spiral\Goridge\RPC\Codec\ProtobufCodec;
 use Spiral\Goridge\RPC\Exception\ServiceException;
@@ -75,7 +74,7 @@ final class Manager
         array $env = [],
         int $restartSec = 30,
         bool $serviceNameInLogs = false,
-        int $stopTimeout = 5
+        int $stopTimeout = 5,
     ): bool {
         \assert($processNum > 0, 'Process number must be greater than 0.');
         \assert($execTimeout >= 0, 'Execution timeout must be greater or equal to 0.');
@@ -154,7 +153,7 @@ final class Manager
      *     cpu_percent: float,
      *     memory_usage: positive-int,
      *     pid: positive-int,
-     *     error?: array{
+     *     error: null|array{
      *        code: int,
      *        message: non-empty-string,
      *        details: array{message: string, type_url: string}[]
@@ -172,16 +171,13 @@ final class Manager
             \assert($response instanceof Statuses);
 
             foreach ($response->getStatus() as $status) {
-                \assert($status instanceof Status);
-
                 $error = null;
                 $statusError = $status->getStatus();
-                /** @psalm-suppress RedundantConditionGivenDocblockType */
                 if ($statusError !== null) {
                     $error = [
                         'code' => $statusError->getCode(),
                         'message' => $statusError->getMessage(),
-                        'details' => \array_map(static fn (Any $any) => [
+                        'details' => \array_map(static fn(Any $any) => [
                             'message' => $any->getValue(),
                             'type_url' => $any->getTypeUrl(),
                         ], \iterator_to_array($statusError->getDetails()->getIterator())),
