@@ -1,37 +1,43 @@
-<a href="https://roadrunner.dev" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/roadrunner-server/.github/assets/8040338/e6bde856-4ec6-4a52-bd5b-bfe78736c1ff">
-    <img align="center" src="https://github.com/roadrunner-server/.github/assets/8040338/040fb694-1dd3-4865-9d29-8e0748c2c8b8">
-  </picture>
-</a>
+<p align="center">
+    <a href="https://roadrunner.dev"><picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/roadrunner-server/.github/assets/8040338/e6bde856-4ec6-4a52-bd5b-bfe78736c1ff">
+        <img alt="RoadRunner" src="https://github.com/roadrunner-server/.github/assets/8040338/040fb694-1dd3-4865-9d29-8e0748c2c8b8" style="width: 6in; display: block">
+    </picture></a>
+</p>
 
-# Roadrunner services manager
+<p align="center">Manage RoadRunner services from PHP</p>
 
-[![PHP Version Require](https://poser.pugx.org/spiral/roadrunner-services/require/php)](https://packagist.org/packages/spiral/roadrunner-services)
-[![Latest Stable Version](https://poser.pugx.org/spiral/roadrunner-services/v/stable)](https://packagist.org/packages/spiral/roadrunner-services)
-[![phpunit](https://github.com/spiral/roadrunner-services/actions/workflows/phpunit.yml/badge.svg)](https://github.com/spiral/roadrunner-services/actions)
-[![psalm](https://github.com/spiral/roadrunner-services/actions/workflows/psalm.yml/badge.svg)](https://github.com/spiral/roadrunner-services/actions)
-[![Total Downloads](https://poser.pugx.org/spiral/roadrunner-services/downloads)](https://packagist.org/packages/spiral/roadrunner-services)
+<div align="center">
 
-This package will help you to manage [Roadrunner services](https://docs.roadrunner.dev/plugins/service)
+[![Documentation](https://img.shields.io/badge/Documentation-blue?style=for-the-badge&logo=gitbook&logoColor=white)](https://docs.roadrunner.dev/docs/plugins/service)
+[![Sponsor](https://img.shields.io/static/v1?style=for-the-badge&label=&message=Sponsor&logo=githubsponsors&logoColor=white&color=%23EA4AAA)](https://github.com/sponsors/roadrunner-server)
 
-## Requirements
+[![Psalm Level](https://shepherd.dev/github/roadrunner-php/services/level.svg)](https://shepherd.dev/github/roadrunner-php/services)
+[![Type Coverage](https://shepherd.dev/github/roadrunner-php/services/coverage.svg)](https://shepherd.dev/github/roadrunner-php/services)
+[![Codecov](https://codecov.io/gh/roadrunner-php/services/branch/2.x/graph/badge.svg)](https://codecov.io/gh/roadrunner-php/services/branch/2.x)
 
-Make sure that your server is configured with following PHP version and extensions:
+</div>
 
-- PHP 8.1+
+<br />
 
-## Installation
+This package lets a PHP application create, restart, terminate and inspect [RoadRunner services](https://docs.roadrunner.dev/docs/plugins/service) at runtime over RPC.
 
-You can install the package via composer:
+## Get Started
+
+### Installation
 
 ```bash
 composer require spiral/roadrunner-services
 ```
 
-## Usage
+[![PHP](https://img.shields.io/packagist/php-v/spiral/roadrunner-services.svg?style=flat-square&logo=php)](https://packagist.org/packages/spiral/roadrunner-services)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/spiral/roadrunner-services.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/spiral/roadrunner-services)
+[![License](https://img.shields.io/packagist/l/spiral/roadrunner-services.svg?style=flat-square)](LICENSE)
+[![Total Downloads](https://img.shields.io/packagist/dt/spiral/roadrunner-services.svg?style=flat-square)](https://packagist.org/packages/spiral/roadrunner-services/stats)
 
-Such a configuration would be quite feasible to run:
+### Configuration
+
+Enable the RPC and service plugins in `.rr.yaml`:
 
 ```yaml
 rpc:
@@ -40,15 +46,19 @@ rpc:
 service: {}
 ```
 
-Then you need to create an instance of `Spiral\RoadRunner\Services\Manager`
+### Connecting to RoadRunner
+
+Create an instance of `Spiral\RoadRunner\Services\Manager`:
 
 ```php
 use Spiral\RoadRunner\Services\Manager;
 use Spiral\Goridge\RPC\RPC;
 
-$rpc = RPC::create('tcp://127.0.0.1:6001'));
+$rpc = RPC::create('tcp://127.0.0.1:6001');
 $manager = new Manager($rpc);
 ```
+
+## Managing Services
 
 ### Create a new service
 
@@ -57,15 +67,17 @@ use Spiral\RoadRunner\Services\Exception\ServiceException;
 
 try {
     $result = $manager->create(
-        name: 'listen-jobs', 
+        name: 'listen-jobs',
         command: 'php app.php queue:listen',
         processNum: 3,
         execTimeout: 0,
         remainAfterExit: false,
         env: ['APP_ENV' => 'production'],
-        restartSec: 30
+        restartSec: 30,
+        serviceNameInLogs: true,
+        stopTimeout: 5,
     );
-    
+
     if (!$result) {
         throw new ServiceException('Service creation failed.');
     }
@@ -81,7 +93,7 @@ use Spiral\RoadRunner\Services\Exception\ServiceException;
 
 try {
     $status = $manager->statuses(name: 'listen-jobs');
-    
+
     // Will return an array with statuses of every run process
     // [
     //    [
@@ -89,20 +101,20 @@ try {
     //      'pid' => 33,
     //      'memory_usage' => 200,
     //      'command' => 'foo/bar',
-    //      'error' => null
+    //      'error' => null,
     //    ],
     //    [
     //      'cpu_percent' => 60.2,
     //      'pid' => 34,
     //      'memory_usage' => 189,
-    //      'command' => 'foo/bar'
+    //      'command' => 'foo/bar',
     //      'error' => [
     //          'code' => 1,
-    //          'message' => 'Process exited with code 1'
+    //          'message' => 'Process exited with code 1',
     //          'details' => [...] // array with details
     //      ]
     //    ],
-    // ] 
+    // ]
 } catch (ServiceException $e) {
     // handle exception
 }
@@ -115,7 +127,7 @@ use Spiral\RoadRunner\Services\Exception\ServiceException;
 
 try {
     $result = $manager->restart(name: 'listen-jobs');
-    
+
     if (!$result) {
         throw new ServiceException('Service restart failed.');
     }
@@ -131,7 +143,7 @@ use Spiral\RoadRunner\Services\Exception\ServiceException;
 
 try {
     $result = $manager->terminate(name: 'listen-jobs');
-    
+
     if (!$result) {
         throw new ServiceException('Service termination failed.');
     }
@@ -147,9 +159,9 @@ use Spiral\RoadRunner\Services\Exception\ServiceException;
 
 try {
     $services = $manager->list();
-    
+
     // Will return an array with services names
-    // ['listen-jobs', 'websocket-connection'] 
+    // ['listen-jobs', 'websocket-connection']
 } catch (ServiceException $e) {
     // handle exception
 }
