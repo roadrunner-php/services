@@ -75,7 +75,7 @@ final class Manager
         array $env = [],
         int $restartSec = 30,
         bool $serviceNameInLogs = false,
-        int $stopTimeout = 5
+        int $stopTimeout = 5,
     ): bool {
         \assert($processNum > 0, 'Process number must be greater than 0.');
         \assert($execTimeout >= 0, 'Execution timeout must be greater or equal to 0.');
@@ -181,7 +181,7 @@ final class Manager
                     $error = [
                         'code' => $statusError->getCode(),
                         'message' => $statusError->getMessage(),
-                        'details' => \array_map(static fn (Any $any) => [
+                        'details' => \array_map(static fn(Any $any) => [
                             'message' => $any->getValue(),
                             'type_url' => $any->getTypeUrl(),
                         ], \iterator_to_array($statusError->getDetails()->getIterator())),
