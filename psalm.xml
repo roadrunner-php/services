@@ -9,6 +9,8 @@
     findUnusedCode="false"
 >
     <issueHandlers>
+        <!-- Making public classes final would break BC for users who extend them -->
+        <ClassMustBeFinal errorLevel="suppress" />
     </issueHandlers>
     <projectFiles>
         <directory name="src" />
