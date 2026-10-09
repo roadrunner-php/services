@@ -6,3 +6,4 @@
 .travis.yml export-ignore
 testo.php export-ignore
 monorepo-builder.php export-ignore
+infection.json5 export-ignore
