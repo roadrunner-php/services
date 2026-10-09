@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Spiral\RoadRunner\Services\Tests;
 
+use Testo\Test;
+use Testo\Assert;
+use Testo\Expect;
+use Testo\Lifecycle\BeforeTest;
 use Google\Protobuf\Any;
 use Mockery as m;
 use Spiral\Goridge\RPC\Codec\ProtobufCodec;
@@ -17,7 +21,8 @@ use RoadRunner\Service\DTO\V1\Statuses;
 use Spiral\RoadRunner\Services\Exception\ServiceException;
 use Spiral\RoadRunner\Services\Manager;
 
-final class ManagerTest extends TestCase
+#[Test]
+final class ManagerTest
 {
     private Manager $manager;
     private m\LegacyMockInterface|m\MockInterface|RPCInterface $rpc;
@@ -35,13 +40,12 @@ final class ManagerTest extends TestCase
 
         $result = $this->manager->list();
 
-        $this->assertSame(['foo', 'bar', 'baz'], $result);
+        Assert::same($result, ['foo', 'bar', 'baz']);
     }
 
     public function testListServicesWithErrorsShouldThrowAnException(): void
     {
-        $this->expectException(ServiceException::class);
-        $this->expectExceptionMessage('Something went wrong');
+        Expect::exception(ServiceException::class)->withMessageContaining('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -71,25 +75,22 @@ final class ManagerTest extends TestCase
             })
             ->andReturn(new Response(['ok' => true]));
 
-        $this->assertTrue(
-            $this->manager->create(
-                'foo',
-                'bar',
-                5,
-                7,
-                true,
-                ['FOO' => 'bar', 'BAZ' => 'foo'],
-                50,
-                true,
-                10,
-            ),
-        );
+        Assert::true($this->manager->create(
+            'foo',
+            'bar',
+            5,
+            7,
+            true,
+            ['FOO' => 'bar', 'BAZ' => 'foo'],
+            50,
+            true,
+            10,
+        ));
     }
 
     public function testServiceCreateWithErrorsShouldThrowAnException(): void
     {
-        $this->expectException(ServiceException::class);
-        $this->expectExceptionMessage('Something went wrong');
+        Expect::exception(ServiceException::class)->withMessageContaining('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -111,13 +112,12 @@ final class ManagerTest extends TestCase
             })
             ->andReturn(new Response(['ok' => true]));
 
-        $this->assertTrue($this->manager->restart('foo'));
+        Assert::true($this->manager->restart('foo'));
     }
 
     public function testServiceRestartWithErrorsShouldThrowAnException(): void
     {
-        $this->expectException(ServiceException::class);
-        $this->expectExceptionMessage('Something went wrong');
+        Expect::exception(ServiceException::class)->withMessageContaining('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -139,13 +139,12 @@ final class ManagerTest extends TestCase
             })
             ->andReturn(new Response(['ok' => true]));
 
-        $this->assertTrue($this->manager->terminate('foo'));
+        Assert::true($this->manager->terminate('foo'));
     }
 
     public function testServiceTerminateWithErrorsShouldThrowAnException(): void
     {
-        $this->expectException(ServiceException::class);
-        $this->expectExceptionMessage('Something went wrong');
+        Expect::exception(ServiceException::class)->withMessageContaining('Something went wrong');
 
         $this->rpc
             ->shouldReceive('call')
@@ -187,7 +186,7 @@ final class ManagerTest extends TestCase
 
         $status = $this->manager->statuses('foo');
 
-        $this->assertSame([
+        Assert::same($status, [
             [
                 'cpu_percent' => 59.5,
                 'pid' => 33,
@@ -201,13 +200,12 @@ final class ManagerTest extends TestCase
                     ],
                 ],
             ],
-        ], $status);
+        ]);
     }
 
+    #[BeforeTest]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->rpc = m::mock(RPCInterface::class);
 
         $this->rpc
