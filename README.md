@@ -28,13 +28,13 @@ This package lets a PHP application create, restart, terminate and inspect [Road
 ### Installation
 
 ```bash
-composer require spiral/roadrunner-services
+composer require roadrunner/services
 ```
 
-[![PHP](https://img.shields.io/packagist/php-v/spiral/roadrunner-services.svg?style=flat-square&logo=php)](https://packagist.org/packages/spiral/roadrunner-services)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/spiral/roadrunner-services.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/spiral/roadrunner-services)
-[![License](https://img.shields.io/packagist/l/spiral/roadrunner-services.svg?style=flat-square)](LICENSE)
-[![Total Downloads](https://img.shields.io/packagist/dt/spiral/roadrunner-services.svg?style=flat-square)](https://packagist.org/packages/spiral/roadrunner-services/stats)
+[![PHP](https://img.shields.io/packagist/php-v/roadrunner/services.svg?style=flat-square&logo=php)](https://packagist.org/packages/roadrunner/services)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/roadrunner/services.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/roadrunner/services)
+[![License](https://img.shields.io/packagist/l/roadrunner/services.svg?style=flat-square)](LICENSE)
+[![Total Downloads](https://img.shields.io/packagist/dt/roadrunner/services.svg?style=flat-square)](https://packagist.org/packages/roadrunner/services/stats)
 
 ### Configuration
 
