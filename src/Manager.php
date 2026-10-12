@@ -26,7 +26,7 @@ final class Manager
     /**
      * Get list of all services.
      *
-     * @return string[] Services name.
+     * @return list<string> Services name.
      * @throws Exception\ServiceException
      */
     public function list(): array
@@ -149,19 +149,17 @@ final class Manager
      *
      * @param non-empty-string $name Service name.
      * @return list<array{
-     *     command: non-empty-string,
+     *     command: string,
      *     cpu_percent: float,
-     *     memory_usage: positive-int,
-     *     pid: positive-int,
+     *     memory_usage: int,
+     *     pid: int,
      *     error: null|array{
      *        code: int,
-     *        message: non-empty-string,
-     *        details: array{message: string, type_url: string}[]
+     *        message: string,
+     *        details: list<array{message: string, type_url: string}>
      *    }
      * }>
      * @throws Exception\ServiceException
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
      */
     public function statuses(string $name): array
     {
@@ -180,14 +178,15 @@ final class Manager
                         'details' => \array_map(static fn(Any $any) => [
                             'message' => $any->getValue(),
                             'type_url' => $any->getTypeUrl(),
-                        ], \iterator_to_array($statusError->getDetails()->getIterator())),
+                        ], \iterator_to_array($statusError->getDetails()->getIterator(), false)),
                     ];
                 }
 
                 $result[] = [
                     'cpu_percent' => $status->getCpuPercent(),
                     'pid' => $status->getPid(),
-                    'memory_usage' => $status->getMemoryUsage(),
+                    // uint64 field: protobuf returns it as a string only on 32-bit PHP builds.
+                    'memory_usage' => (int) $status->getMemoryUsage(),
                     'command' => $status->getCommand(),
                     'error' => $error,
                 ];
