@@ -51,7 +51,9 @@
         "spiral/roadrunner": "^3.0"
     },
     "require-dev": {
+        "llm/skills": "^1.14",
         "mockery/mockery": "^1.5",
+        "roxblnfk/unpoly": "^1.8",
         "spiral/code-style": "^2.3.1",
         "testo/bridge-mockery": "^0.1.2",
         "testo/testo": "^0.10.55",
@@ -77,6 +79,9 @@
         "psalm": "psalm --no-cache"
     },
     "config": {
+        "allow-plugins": {
+            "llm/skills": true
+        },
         "sort-packages": true,
         "audit": {
             "ignore": {
