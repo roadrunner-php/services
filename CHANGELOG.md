@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/roadrunner-php/services/compare/2.4.0...2.4.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* require roadrunner/roadrunner instead of spiral/roadrunner ([2286f8c](https://github.com/roadrunner-php/services/commit/2286f8c3163391b64e460edeaef2d3a7c6d117c7))
+
 ## [2.4.0](https://github.com/roadrunner-php/services/compare/2.3.0...2.4.0) (2026-10-10)
 
 
